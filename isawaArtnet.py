@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 isawaArtnet - Professional DMX to Art-Net Converter Library
-Version: 2.1.0 (Art-Net 4 Compliant)
+Version: 2.1.1 (Art-Net 4 Compliant - FIXED)
 Author: Based on pixcapture.py
 License: MIT
 
@@ -10,6 +10,8 @@ synchronous and asynchronous (asyncio) support for DMX512 data transmission.
 
 CRITICAL: Art-Net 4 requires UNICAST transmission for ArtDmx packets.
 Broadcast transmission is strictly prohibited by the specification.
+
+FIXED: Length field now uses correct big-endian byte order
 """
 
 import socket
@@ -17,7 +19,7 @@ import struct
 import asyncio
 from typing import List, Dict, Optional, Tuple, Any
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __all__ = [
     'DmxFrame', 'ArtNetPacket', 
     'ArtNetController', 'AsyncArtNetController',
@@ -244,9 +246,11 @@ class ArtNetPacket:
         sub_uni = universe & 0xFF        # Low 8 bits (Sub-Net + Universe)
         net = (universe >> 8) & 0x7F     # High 7 bits (Net)
         
-        # Pack header - Art-Net 4 format
+        # 🔧 FIX: Pack header with correct byte orders
+        # OpCode: little-endian (< prefix)
+        # Length: big-endian (> prefix)
         header = struct.pack(
-            '8s H BB BBBB H',
+            '<8s H BB BBBB',
             cls.ARTNET_HEADER,           # ID[8]
             cls.OPCODE_DMX,              # OpCode (little-endian)
             cls.PROTOCOL_VERSION_HI,     # ProtVerHi
@@ -255,10 +259,13 @@ class ArtNetPacket:
             physical,                     # Physical
             sub_uni,                      # SubUni
             net,                          # Net
-            cls.DMX_CHANNELS              # Length (big-endian)
         )
         
+        # Add Length field separately as big-endian
+        length_bytes = struct.pack('>H', cls.DMX_CHANNELS)  # Big-endian
+        
         packet = bytearray(header)
+        packet.extend(length_bytes)
         packet.extend(dmx_data)
         
         return packet
@@ -267,7 +274,7 @@ class ArtNetPacket:
     def create_poll(cls) -> bytearray:
         """Create an ArtPoll packet for device discovery."""
         packet = struct.pack(
-            '8s H BB BB',
+            '<8s H BB BB',
             cls.ARTNET_HEADER,
             cls.OPCODE_POLL,
             cls.PROTOCOL_VERSION_HI,
@@ -686,9 +693,10 @@ if __name__ == "__main__":
     import time
     import math
     
-    print("isawaArtnet v2.1.0 - Art-Net 4 Compliant Edition")
+    print("isawaArtnet v2.1.1 - Art-Net 4 Compliant Edition [FIXED]")
     print("="*70)
     print("IMPORTANT: Art-Net 4 requires UNICAST transmission for ArtDmx.")
+    print("FIX: Length field now uses correct big-endian byte order")
     print("="*70)
     
     # Synchronous Demo
