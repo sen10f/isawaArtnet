@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isawaartnet"
+version = "0.1.3"
+description = "DMX to Art-Net 4 Converter Library(But send only)"
+readme = "README.md"
+authors = [
+    {name = "inu", email = "yukkiamp993@gmail.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Networking",
+    "Topic :: Multimedia",
+]
+keywords = ["artnet", "dmx", "dmx512", "lighting", "stage"]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/sen10/isawaArtnet"
+Documentation = "https://github.com/sen10/isawaArtnet#readme"
+Repository = "https://github.com/sen10/isawaArtnet"
+Issues = "https://github.com/sen10/isawaArtnet/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+isawaartnet = ["py.typed"]
