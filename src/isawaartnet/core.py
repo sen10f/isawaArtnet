@@ -18,7 +18,7 @@ import struct
 import asyncio
 from typing import List, Dict, Optional, Tuple, Any
 
-__version__ = "0.1.3"
+__version__ = "1.0.0"
 __all__ = [
     'DmxFrame', 'ArtNetPacket', 
     'ArtNetController', 'AsyncArtNetController',
